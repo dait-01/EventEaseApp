@@ -1,0 +1,57 @@
+@using EventEase.Models
+
+<div class="event-card border rounded p-3 shadow-sm">
+    <h3>@Event.Name</h3>
+
+    <div class="mb-2">
+        <label class="form-label fw-semibold">Name</label>
+        <input class="form-control" value="@Event.Name" @oninput="OnNameChanged" />
+    </div>
+
+    <div class="mb-2">
+        <label class="form-label fw-semibold">Date</label>
+        <input class="form-control" type="date" value="@Event.Date.ToString("yyyy-MM-dd")" @oninput="OnDateChanged" />
+    </div>
+
+    <div>
+        <label class="form-label fw-semibold">Location</label>
+        <input class="form-control" value="@Event.Location" @oninput="OnLocationChanged" />
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public Event Event { get; set; } = new();
+
+    [Parameter]
+    public EventCallback<Event> EventChanged { get; set; }
+
+    private async Task OnNameChanged(ChangeEventArgs e)
+    {
+        Event.Name = e.Value?.ToString() ?? string.Empty;
+        await NotifyChanged();
+    }
+
+    private async Task OnDateChanged(ChangeEventArgs e)
+    {
+        if (DateTime.TryParse(e.Value?.ToString(), out var date))
+        {
+            Event.Date = date;
+            await NotifyChanged();
+        }
+    }
+
+    private async Task OnLocationChanged(ChangeEventArgs e)
+    {
+        Event.Location = e.Value?.ToString() ?? string.Empty;
+        await NotifyChanged();
+    }
+
+    private async Task NotifyChanged()
+    {
+        if (EventChanged.HasDelegate)
+        {
+            await EventChanged.InvokeAsync(Event);
+        }
+    }
+}

@@ -1,0 +1,18 @@
+﻿@page "/"
+@using EventEase.Components
+@using EventEase.Models
+
+<PageTitle>Home</PageTitle>
+
+<h1>Event Details</h1>
+
+<EventCard @bind-Event="eventModel" />
+
+@code {
+    private Event eventModel = new()
+    {
+        Name = "Tech Conference",
+        Date = new DateTime(2026, 11, 15),
+        Location = "Seattle, WA"
+    };
+}

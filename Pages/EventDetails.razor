@@ -1,0 +1,39 @@
+@page "/events/{id:int}"
+@using EventEase.Components
+@using EventEase.Models
+
+<PageTitle>Event Details</PageTitle>
+
+@if (eventItem is null)
+{
+    <p>Event not found.</p>
+}
+else
+{
+    <h1>Event Details</h1>
+    <div class="mt-3">
+        <EventCard Event="eventItem" />
+    </div>
+
+    <NavLink class="btn btn-secondary mt-3" href="/events">Back to Events</NavLink>
+    <NavLink class="btn btn-primary mt-3" href="@($"/register/{Id}")">Register</NavLink>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private Event? eventItem;
+
+    private static readonly List<Event> EventCatalog = new()
+    {
+        new Event { Id = 1, Name = "Tech Conference", Date = new DateTime(2026, 11, 15), Location = "Seattle, WA" },
+        new Event { Id = 2, Name = "Design Meetup", Date = new DateTime(2026, 12, 03), Location = "Chicago, IL" },
+        new Event { Id = 3, Name = "AI Summit", Date = new DateTime(2027, 01, 12), Location = "Boston, MA" }
+    };
+
+    protected override void OnParametersSet()
+    {
+        eventItem = EventCatalog.FirstOrDefault(e => e.Id == Id);
+    }
+}

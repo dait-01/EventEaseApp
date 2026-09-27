@@ -1,0 +1,35 @@
+@page "/events"
+@using EventEase.Components
+@using EventEase.Models
+
+<PageTitle>Events</PageTitle>
+
+<h1>Upcoming Events</h1>
+
+@if (events is null || events.Count == 0)
+{
+    <p>No events available.</p>
+}
+else
+{
+    <div class="d-flex flex-column gap-3">
+        @foreach (var eventItem in events)
+        {
+            <div class="position-relative">
+                <EventCard Event="eventItem" />
+                <NavLink class="btn btn-primary mt-3" href="@($"/events/{eventItem.Id}")">
+                    View Details
+                </NavLink>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    private List<Event> events = new()
+    {
+        new Event { Id = 1, Name = "Tech Conference", Date = new DateTime(2026, 11, 15), Location = "Seattle, WA" },
+        new Event { Id = 2, Name = "Design Meetup", Date = new DateTime(2026, 12, 03), Location = "Chicago, IL" },
+        new Event { Id = 3, Name = "AI Summit", Date = new DateTime(2027, 01, 12), Location = "Boston, MA" }
+    };
+}
