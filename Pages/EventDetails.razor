@@ -1,12 +1,13 @@
 @page "/events/{id:int}"
 @using EventEase.Components
 @using EventEase.Models
+@using EventEase.Services
 
 <PageTitle>Event Details</PageTitle>
 
 @if (eventItem is null)
 {
-    <p>Event not found.</p>
+    <EventNotFound />
 }
 else
 {
@@ -20,20 +21,16 @@ else
 }
 
 @code {
+    [Inject]
+    public EventService EventService { get; set; } = default!;
+
     [Parameter]
     public int Id { get; set; }
 
     private Event? eventItem;
 
-    private static readonly List<Event> EventCatalog = new()
-    {
-        new Event { Id = 1, Name = "Tech Conference", Date = new DateTime(2026, 11, 15), Location = "Seattle, WA" },
-        new Event { Id = 2, Name = "Design Meetup", Date = new DateTime(2026, 12, 03), Location = "Chicago, IL" },
-        new Event { Id = 3, Name = "AI Summit", Date = new DateTime(2027, 01, 12), Location = "Boston, MA" }
-    };
-
     protected override void OnParametersSet()
     {
-        eventItem = EventCatalog.FirstOrDefault(e => e.Id == Id);
+        eventItem = EventService.GetById(Id);
     }
 }

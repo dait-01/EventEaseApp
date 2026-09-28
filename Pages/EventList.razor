@@ -1,0 +1,39 @@
+@page "/events"
+@using EventEase.Components
+@using EventEase.Models
+@using EventEase.Services
+@using Microsoft.AspNetCore.Components.Web.Virtualization
+
+<PageTitle>Events</PageTitle>
+
+<h1>Upcoming Events</h1>
+
+@if (events is null || events.Count == 0)
+{
+    <p>No events available.</p>
+}
+else
+{
+    <div class="event-list-container" style="height: 650px; overflow-y: auto;">
+        <Virtualize Items="events" Context="eventItem" ItemSize="260">
+            <div class="position-relative mb-3">
+                <EventCard Event="eventItem" />
+                <NavLink class="btn btn-primary mt-3" href="@($"/events/{eventItem.Id}")">
+                    View Details
+                </NavLink>
+            </div>
+        </Virtualize>
+    </div>
+}
+
+@code {
+    [Inject]
+    public EventService EventService { get; set; } = default!;
+
+    private List<Event> events = new();
+
+    protected override void OnInitialized()
+    {
+        events = EventService.GetAll().ToList();
+    }
+}

@@ -1,23 +1,28 @@
 @using EventEase.Models
 
-<div class="event-card border rounded p-3 shadow-sm">
+<EditForm Model="Event" class="event-card border rounded p-3 shadow-sm">
+    <DataAnnotationsValidator />
+
     <h3>@Event.Name</h3>
 
     <div class="mb-2">
-        <label class="form-label fw-semibold">Name</label>
-        <input class="form-control" value="@Event.Name" @oninput="OnNameChanged" />
+        <label class="form-label fw-semibold" for="event-name">Name</label>
+        <InputText id="event-name" class="form-control" Value="Event.Name" ValueChanged="@(async (string value) => await OnNameChanged(value))" ValueExpression="() => Event.Name" />
+        <ValidationMessage For="@(() => Event.Name)" />
     </div>
 
     <div class="mb-2">
-        <label class="form-label fw-semibold">Date</label>
-        <input class="form-control" type="date" value="@Event.Date.ToString("yyyy-MM-dd")" @oninput="OnDateChanged" />
+        <label class="form-label fw-semibold" for="event-date">Date</label>
+        <InputDate id="event-date" class="form-control" Value="Event.Date" ValueChanged="@(async (DateTime? value) => await OnDateChanged(value))" ValueExpression="() => Event.Date" />
+        <ValidationMessage For="@(() => Event.Date)" />
     </div>
 
     <div>
-        <label class="form-label fw-semibold">Location</label>
-        <input class="form-control" value="@Event.Location" @oninput="OnLocationChanged" />
+        <label class="form-label fw-semibold" for="event-location">Location</label>
+        <InputText id="event-location" class="form-control" Value="Event.Location" ValueChanged="@(async (string value) => await OnLocationChanged(value))" ValueExpression="() => Event.Location" />
+        <ValidationMessage For="@(() => Event.Location)" />
     </div>
-</div>
+</EditForm>
 
 @code {
     [Parameter]
@@ -26,24 +31,21 @@
     [Parameter]
     public EventCallback<Event> EventChanged { get; set; }
 
-    private async Task OnNameChanged(ChangeEventArgs e)
+    private async Task OnNameChanged(string value)
     {
-        Event.Name = e.Value?.ToString() ?? string.Empty;
+        Event.Name = value ?? string.Empty;
         await NotifyChanged();
     }
 
-    private async Task OnDateChanged(ChangeEventArgs e)
+    private async Task OnDateChanged(DateTime? value)
     {
-        if (DateTime.TryParse(e.Value?.ToString(), out var date))
-        {
-            Event.Date = date;
-            await NotifyChanged();
-        }
+        Event.Date = value;
+        await NotifyChanged();
     }
 
-    private async Task OnLocationChanged(ChangeEventArgs e)
+    private async Task OnLocationChanged(string value)
     {
-        Event.Location = e.Value?.ToString() ?? string.Empty;
+        Event.Location = value ?? string.Empty;
         await NotifyChanged();
     }
 
