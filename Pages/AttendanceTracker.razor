@@ -1,0 +1,68 @@
+@page "/attendance/{id:int}"
+@using EventEase.Models
+@using EventEase.Services
+@using EventEase.Components
+@using RegistrationModel = EventEase.Models.Registration
+
+<PageTitle>Attendance Tracker</PageTitle>
+
+@if (eventItem is null)
+{
+   <EventNotFound />
+}
+else
+{
+    <h1>@eventItem.Name Attendance</h1>
+
+    @if (registrations is null || !registrations.Any())
+    {
+        <div class="alert alert-info mt-3" role="alert">
+            No one has registered for this event yet.
+        </div>
+    }
+    else
+    {
+        <div class="mt-3">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var registration in registrations)
+                    {
+                        <tr>
+                            <td>@registration.Name</td>
+                            <td>@registration.Email</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <p><strong>Total registered:</strong> @registrations.Count()</p>
+        </div>
+    }
+
+    <NavLink class="btn btn-secondary mt-3" href="@($"/events/{Id}")">Back to Event Details</NavLink>
+}
+
+@code {
+    [Inject]
+    public EventService EventService { get; set; } = default!;
+
+    [Inject]
+    public UserSessionService UserSessionService { get; set; } = default!;
+
+    [Parameter]
+    public int Id { get; set; }
+
+    private Event? eventItem;
+    private IEnumerable<RegistrationModel> registrations = Enumerable.Empty<RegistrationModel>();
+
+    protected override void OnParametersSet()
+    {
+        eventItem = EventService.GetById(Id);
+        registrations = UserSessionService.GetRegistrationsForEvent(Id);
+    }
+}

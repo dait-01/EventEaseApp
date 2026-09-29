@@ -13,19 +13,32 @@ else
 {
     <h1>Register for @eventItem.Name</h1>
 
-    <div class="mt-3" style="max-width: 420px;">
-        <div class="mb-3">
-            <label class="form-label">Name</label>
-            <input class="form-control" placeholder="Enter your name" />
-        </div>
+    <EditForm Model="registration" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator />
 
-        <div class="mb-3">
-            <label class="form-label">Email</label>
-            <input type="email" class="form-control" placeholder="Enter your email" />
-        </div>
+        <div class="mt-3" style="max-width: 420px;">
+            <div class="mb-3">
+                <label class="form-label">Name</label>
+                <InputText class="form-control" @bind-Value="registration.Name" placeholder="Enter your name" />
+                <ValidationMessage For="@(() => registration.Name)" />
+            </div>
 
-        <button class="btn btn-primary" type="button">Submit</button>
-    </div>
+            <div class="mb-3">
+                <label class="form-label">Email</label>
+                <InputText type="email" class="form-control" @bind-Value="registration.Email" placeholder="Enter your email" />
+                <ValidationMessage For="@(() => registration.Email)" />
+            </div>
+
+            <button class="btn btn-primary" type="submit">Submit</button>
+        </div>
+    </EditForm>
+
+    @if (!string.IsNullOrWhiteSpace(confirmationMessage))
+    {
+        <div class="alert alert-success mt-3" role="alert">
+            @confirmationMessage
+        </div>
+    }
 
     <NavLink class="btn btn-secondary mt-3" href="@($"/events/{Id}")">Back to Event Details</NavLink>
 }
@@ -34,13 +47,32 @@ else
     [Inject]
     public EventService EventService { get; set; } = default!;
 
+    [Inject]
+    public UserSessionService UserSessionService { get; set; } = default!;
+
     [Parameter]
     public int Id { get; set; }
 
     private Event? eventItem;
+    private EventEase.Models.Registration registration = new();
+    private string? confirmationMessage;
 
     protected override void OnParametersSet()
     {
         eventItem = EventService.GetById(Id);
+        registration = new EventEase.Models.Registration { EventId = Id };
+        confirmationMessage = null;
+    }
+
+    private void HandleValidSubmit()
+    {
+        if (eventItem is null)
+        {
+            return;
+        }
+
+        registration.EventId = Id;
+        UserSessionService.AddRegistration(registration);
+        confirmationMessage = $"Thanks, {registration.Name}! Your registration for {eventItem.Name} has been confirmed.";
     }
 }
